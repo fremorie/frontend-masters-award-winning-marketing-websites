@@ -1,13 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React from 'react';
+import React, {useRef} from 'react';
 import s from "./styles.module.css";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {distance} from "@/lib/math";
 
 export default function Page() {
-    const [distanceValue, setDistanceValue] = useState(0);
+    const titleRef = useRef(null)
 
   useEffect(() => {
     const controller = new AbortController();
@@ -28,7 +28,9 @@ export default function Page() {
 
           const maxDistance = distance(0, 0, centerX, centerY);
 
-            setDistanceValue(d / maxDistance);
+            if (titleRef.current) {
+                titleRef.current.style.setProperty('--distance', (d / maxDistance).toString());
+            }
         },
         {
           signal: controller.signal,
@@ -45,14 +47,16 @@ export default function Page() {
         s.grid
       )}
     >
+        <script
+            crossOrigin="anonymous"
+            src="//unpkg.com/react-scan/dist/auto.global.js"
+        />
       <h1
         className={cn(
           "uppercase text-[10vh] leading-none relative",
           s["title"]
         )}
-        style={{
-            '--distance': distanceValue,
-        } as React.CSSProperties}
+        ref={titleRef}
       >
         Variables
       </h1>
