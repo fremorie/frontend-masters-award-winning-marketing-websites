@@ -2,23 +2,34 @@
 
 import {useEffect, useRef} from "react";
 import gsap from 'gsap'
+import {useGSAP} from "@gsap/react";
 
 export default function Page() {
     const containerRef = useRef(null)
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.to('.title', {
-                x: 200,
-                duration: 1,
-                onUpdate: () => console.log('update')
-            })
-        }, containerRef)
+    // useEffect(() => {
+    //     const ctx = gsap.context(() => {
+    //         gsap.to('.title', {
+    //             x: 200,
+    //             duration: 1,
+    //             onUpdate: () => console.log('update')
+    //         })
+    //     }, containerRef)
+    //
+    //     return () => {
+    //         ctx.revert()
+    //     }
+    // }, [])
 
-        return () => {
-            ctx.revert()
-        }
-    }, [])
+    useGSAP(() => {
+        gsap.to('.title', {
+            x: 200,
+            duration: 10,
+            onUpdate: () => console.log('update')
+        })
+    }, {
+        scope: containerRef,
+    })
 
   return (
     <div className="bg-blue-300 text-black">
