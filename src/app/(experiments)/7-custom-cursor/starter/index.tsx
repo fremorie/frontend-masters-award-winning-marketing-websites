@@ -19,17 +19,17 @@ export default function Page() {
     });
 
     useEffect(() => {
-        const callback = () => {
+        const callback: gsap.TickerCallback = (time, deltaTime) => {
             cursorPosRef.current.x = lerp(
                 cursorPosRef.current.x,
                 cursorTargetRef.current.x,
-                0.1
+                deltaTime * 0.1
             );
 
             cursorPosRef.current.y = lerp(
                 cursorPosRef.current.y,
                 cursorTargetRef.current.y,
-                0.1
+                deltaTime * 0.1
             );
 
             if (mouseRef.current) {
