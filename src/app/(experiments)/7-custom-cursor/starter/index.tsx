@@ -3,6 +3,7 @@
 import s from "./styles.module.css";
 import {useEffect, useRef} from "react";
 import {lerp} from "@/lib/math";
+import gsap from 'gsap';
 
 export default function Page() {
     const mouseRef = useRef<HTMLDivElement>(null);
@@ -35,11 +36,11 @@ export default function Page() {
                 mouseRef.current.style.setProperty('--x', cursorPosRef.current.x.toString());
                 mouseRef.current.style.setProperty('--y', cursorPosRef.current.y.toString());
             }
-
-            requestAnimationFrame(callback);
         }
 
-        callback();
+        const cb = gsap.ticker.add(callback);
+
+        return () => gsap.ticker.remove(cb);
     }, [])
 
     useEffect(() => {
