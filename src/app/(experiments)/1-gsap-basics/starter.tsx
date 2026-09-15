@@ -3,6 +3,9 @@
 import {useEffect, useRef} from "react";
 import gsap from 'gsap'
 import {useGSAP} from "@gsap/react";
+import { SplitText } from 'gsap/all'
+
+gsap.registerPlugin(SplitText)
 
 export default function Page() {
     const containerRef = useRef(null)
@@ -21,10 +24,30 @@ export default function Page() {
     //     }
     // }, [])
 
+    // useGSAP(() => {
+    //     gsap.from('.title', {
+    //         y: 200,
+    //         opacity: 0,
+    //         ease: 'circ.out',
+    //         duration: 1,
+    //         onUpdate: () => console.log('update')
+    //     })
+    // }, {
+    //     scope: containerRef,
+    // })
+
     useGSAP(() => {
-        gsap.to('.title', {
-            x: 200,
-            duration: 10,
+        SplitText.create('.title', {
+            type: 'chars, words',
+            charsClass: 'letter',
+        })
+
+        gsap.from('.title .letter', {
+            y: 200,
+            opacity: 0,
+            ease: 'circ.out',
+            stagger: 0.05,
+            duration: 1,
             onUpdate: () => console.log('update')
         })
     }, {
