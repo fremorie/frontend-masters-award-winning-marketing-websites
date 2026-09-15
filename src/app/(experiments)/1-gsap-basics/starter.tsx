@@ -16,7 +16,7 @@ export default function Page() {
         }, containerRef)
 
         return () => {
-            //tween.revert()
+            ctx.revert()
         }
     }, [])
 
