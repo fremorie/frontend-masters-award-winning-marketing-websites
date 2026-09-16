@@ -41,10 +41,35 @@ export default function Page() {
       });
 
       tl.to(progressRef, {
-        current: 1,
+        current: 0.35,
+        duration: 0.3,
       });
 
+      tl.to('.cameras', {
+        autoAlpha: 1,
+        duration: 0.1,
+      }, '-=0.2s');
 
+      tl.to('.cameras', {
+        delay: 0.1,
+        autoAlpha: 0,
+        duration: 0.1,
+      });
+
+      tl.to('.title', {
+        autoAlpha: 0,
+        duration: 0.05,
+      }, 0.05);
+
+      tl.to(progressRef, {
+        current: 1,
+        duration: 0.4,
+      });
+
+      tl.to('.wheels', {
+        autoAlpha: 1,
+        duration: 0.05,
+      }, '-=0.1');
     },
     { scope: containerRef }
   );
