@@ -1,14 +1,18 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import React from 'react'
+import {useEffect, useRef} from "react";
 import gsap from "gsap";
-import { SplitText } from "gsap/all";
+import { SplitText, ScrollTrigger } from "gsap/all";
+import {fitContent, remap} from "@/lib/math";
 
 gsap.registerPlugin(SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Page() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef(0);
 
   useGSAP(
     () => {
@@ -26,6 +30,21 @@ export default function Page() {
         duration: 0.5,
         ease: "circ.out",
       });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true, // attached to scroll
+        }
+      });
+
+      tl.to(progressRef, {
+        current: 1,
+      });
+
+
     },
     { scope: containerRef }
   );
@@ -33,12 +52,13 @@ export default function Page() {
   return (
     <div ref={containerRef} className="h-[400vh]">
       <div className="relative w-full overflow-clip">
-        <section className="title h-screen relative w-full">
+        <ScrollSequence progress={progressRef} />
+        <section className="title h-screen fixed w-full">
           <h1 className="uppercase absolute text-[8vw] w-full text-center -bottom-[0.1em] leading-none right-[0.05em] tracking-widest text-transparent">
             Perseverance
           </h1>
         </section>
-        <section className="cameras relative h-screen w-full top-0 left-0 opacity-100">
+        <section className="cameras opacity-0 fixed h-screen w-full top-0 left-0">
           <div className="absolute top-1/2 -translate-y-1/2 right-10 max-w-full w-md text-white">
             <h2 className="text-6xl mb-2">Cameras</h2>
             <p className="text-balance">
@@ -49,7 +69,7 @@ export default function Page() {
             </p>
           </div>
         </section>
-        <section className="wheels relative h-screen w-full opacity-100">
+        <section className="wheels opacity-0 fixed h-screen w-full">
           <div className="absolute bottom-10 left-16 max-w-full w-md text-white">
             <h2 className="text-6xl mb-2">Wheels</h2>
             <p className="text-balance">
@@ -61,4 +81,68 @@ export default function Page() {
       </div>
     </div>
   );
+}
+
+function ScrollSequence({progress}: {
+  progress: React.RefObject<number>
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    function resize () {
+      if (!canvas) return;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+
+    resize();
+
+    window.addEventListener('resize', resize);
+
+    const images: Record<number, HTMLImageElement> = {}
+
+    for (let i = 0; i < 300; i ++) {
+      const img = new Image()
+      img.src = `/sequence/${(i + 1).toString().padStart(4, '0')}.webp`;
+      img.onload = () => {
+        images[i + 1] = img;
+      }
+    }
+
+
+    gsap.ticker.add(() => {
+      if (!canvas || !ctx) return;
+
+      let frameNumber = remap(progress.current, 0, 1, 1, 300);
+      frameNumber = Math.round(frameNumber);
+
+      const img = images[frameNumber];
+
+      if (!img) return;
+
+      const {x, y, width, height} = fitContent(
+          canvas.offsetWidth,
+          canvas.offsetHeight,
+          img.width,
+          img.height,
+      )
+
+      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+      ctx.drawImage(img, x, y, width, height);
+    })
+
+  }, [])
+
+  return (
+      <canvas
+          ref={canvasRef}
+          className="fixed inset-0 w-full h-full border border-red-600"
+      />
+  )
 }
